@@ -1,7 +1,7 @@
 
 import './pages/index.css';
 import {initialCards} from './scripts/cards';
-import {renderCard } from './scripts/card';
+import {renderCard, likeCard, deleteCard  } from './scripts/card';
 import {openPopup, closePopup, closeOverlay} from './scripts/modal';
 
 
@@ -27,15 +27,8 @@ const openImagePopup = (imageURL, imageAlt, title) => {
 };
 
 
-const likeCard = (evt) => {
-  evt.target.classList.toggle('card__like-button_is-active');
-};
 
 
-const deleteCard = (evt) => {
-  const parent = evt.target.closest('.card');
-  parent.remove();
-};
 
 
 const handleProfileFormSubmit = (evt) => {
@@ -108,11 +101,14 @@ popupNewCard.addEventListener('click', (evt) => {
 });
 
 
-document.addEventListener('click', (evt) => {
-  if (evt.target.classList.contains('popup__close')) {
-    closePopup(evt.target.parentNode.parentNode);
-  }
+const closeButtons = document.querySelectorAll('.popup__close');
+
+
+closeButtons.forEach((button) => {
+  const popup = button.closest('.popup');
+  button.addEventListener('click', () => closePopup(popup));
 });
+
 
 
 initialCards.forEach((card) =>

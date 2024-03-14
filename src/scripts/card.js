@@ -20,7 +20,7 @@ function createCard(cardData, deleteCardFunction, likeCardFunction, openFullImag
   });
 
 
-  cardElement.querySelector('.card__image').addEventListener('click', () => {
+  cardImage.addEventListener('click', () => {
     openFullImageFunction(cardImage.src, cardImage.alt, cardTitle.textContent);
   });
 
@@ -28,6 +28,15 @@ function createCard(cardData, deleteCardFunction, likeCardFunction, openFullImag
   return cardElement;
 };
 
+const likeCard = (evt) => {
+  evt.target.classList.toggle('card__like-button_is-active');
+};
+
+
+const deleteCard = (evt) => {
+  const parent = evt.target.closest('.card');
+  parent.remove();
+};
 
 const renderCard = (
   item,
@@ -46,4 +55,5 @@ const renderCard = (
 };
 
 
-export { renderCard };
+
+export { renderCard, likeCard, deleteCard };
