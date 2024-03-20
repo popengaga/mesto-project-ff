@@ -3,9 +3,11 @@ import './pages/index.css';
 import {renderCard, likeCard, deleteCard  } from './scripts/card';
 import {openPopup, closePopup, closeOverlay} from './scripts/modal';
 import { clearValidation, enableValidation } from './scripts/validation';
-import { getInitialInfo, postNewCard, updateUserProfile } from './scripts/api';
+import { getInitialInfo, postNewCard, updateUserProfile, updateUserAvatar } from './scripts/api';
 
-
+const popupAvatar = document.querySelector('.popup_type_avatar');
+const popupAvatarForm = document.forms['edit-avatar'];
+const avatarEditButton = document.querySelector('.profile__image-container');
 const profileAvatar = document.querySelector('.profile__image');
 const popupProfile = document.querySelector('.popup_type_edit');
 const popupProfileForm = document.forms['edit-profile'];
@@ -19,6 +21,7 @@ const popupImageElement = document.querySelector('.popup_type_image');
 const popupImage = popupImageElement.querySelector('.popup__image');
 const popupCaption = popupImageElement.querySelector('.popup__caption');
 const placesList = document.querySelector('.places__list'); 
+
 
 const validationConfig = {
   formSelector: '.popup__form',
@@ -56,20 +59,31 @@ const openImagePopup = (imageURL, imageAlt, title) => {
   openPopup(popupImageElement);
 };
 
+const renderLoading = (isLoading, button) => {
+  if (isLoading) {
+    button.textContent = 'Сохранение...';
+  } else {
+    button.textContent = 'Сохранить';
+  }
+};
+
 
 const handleProfileFormSubmit = async (evt) => {
   evt.preventDefault();
+  renderLoading(true, popupProfileForm.querySelector('.popup__button'));
   updateUserProfile({
     name: popupProfileForm.name.value,
     about: popupProfileForm.description.value,
   })
     .then((updatedProfile) => {
       fillProfileInfo(updatedProfile);
-      closeModal(popupProfile);
-      clearValidation(popupProfile, validationConfig);
+      closePopup(popupProfile);
     })
     .catch((err) => {
       console.log(err);
+    })
+    .finally(() => {
+      renderLoading(true, popupProfileForm.querySelector('.popup__button'));
     });
 };
 
@@ -128,8 +142,6 @@ popupNewCardForm.addEventListener('submit', async(evt) => {
         'start',
       );
       closePopup(popupNewCard);
-      popupNewCardForm.reset();
-      clearValidation(popupNewCard, validationConfig);
     })
     .catch((err) => {
       console.log(err);
@@ -138,6 +150,34 @@ popupNewCardForm.addEventListener('submit', async(evt) => {
 
 
 popupNewCard.addEventListener('click', (evt) => {
+  closeOverlay(evt);
+});
+
+const handleAvatarFormSubmit = async (evt) => {
+  evt.preventDefault();
+  renderLoading(true, popupAvatarForm.querySelector('.popup__button'));
+  updateUserAvatar(popupAvatarForm.link.value)
+    .then((updatedProfile) => {
+      fillProfileInfo(updatedProfile);
+      closePopup(popupAvatar);
+      clearValidation(popupAvatarForm, validationConfig);
+    })
+    .catch((err) => {
+      console.log(err);
+    })
+    .finally(() => {
+      renderLoading(false, popupAvatarForm.querySelector('.popup__button'));
+    });
+};
+avatarEditButton.addEventListener('click', (evt) => {
+  clearValidation(popupAvatarForm, validationConfig);
+  popupAvatarForm.reset();
+  openPopup(popupAvatar);
+});
+
+popupAvatarForm.addEventListener('submit', handleAvatarFormSubmit);
+
+popupAvatar.addEventListener('click', (evt) => {
   closeOverlay(evt);
 });
 

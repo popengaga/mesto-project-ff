@@ -18,14 +18,13 @@ function createCard(cardData, userInfo, deleteCardFunction, likeCardFunction, op
   cardElement.id = cardData._id;
   cardElement.dataset.ownerId = cardData.owner._id;
   
-  
 
   let amountOfLikes = 0;
   cardData.likes.forEach((like) => {
     if (like.name === cardData.owner.name) {
       cardLikeButton.classList.add('card__like-button_is-active');
     }
-    amountOfLikes += 1;
+    amountOfLikes = cardData.likes.length;
   });
   cardLikeCount.textContent = amountOfLikes;
 
@@ -37,7 +36,7 @@ function createCard(cardData, userInfo, deleteCardFunction, likeCardFunction, op
     cardDeleteButton.remove();
   }
 
-  cardElement.querySelector('.card__like-button').addEventListener('click', (evt) => {
+  cardLikeButton.addEventListener('click', (evt) => {
     likeCardFunction(evt);
   });
 
@@ -52,7 +51,7 @@ function createCard(cardData, userInfo, deleteCardFunction, likeCardFunction, op
 
 
 const likeCard = async (evt) => {
-  let currentLikes = evt.target.parentNode.querySelector('.card__like-count');
+  const currentLikes = evt.target.parentNode.querySelector('.card__like-count');
 
   if (evt.target.classList.contains('card__like-button_is-active')) {
     deleteLike(evt.target.closest('.card').id)

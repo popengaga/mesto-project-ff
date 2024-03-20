@@ -7,31 +7,21 @@ const config = {
 };
 
 
+const checkResponse = (res) => {
+  return res.ok ? res.json() : Promise.reject(`Ошибка: ${res.status}`);
+};
+
 const getInitialCards = async () => {
-  return new Promise((resolve, reject) => {
-    fetch(config.baseUrl + '/cards', {
-      headers: config.headers,
-    }).then((res) => {
-      if (res.ok) {
-        resolve(res.json());
-      }
-      reject(`Ошибка: ${res.status}`);
-    });
-  });
+  return fetch(config.baseUrl + '/cards', {
+    headers: config.headers,
+  }).then((res) => checkResponse(res));
 };
 
 
 const getUserInfo = async () => {
-  return new Promise((resolve, reject) => {
-    fetch(config.baseUrl + '/users/me', {
-      headers: config.headers,
-    }).then((res) => {
-      if (res.ok) {
-        resolve(res.json());
-      }
-      reject(`Ошибка: ${res.status}`);
-    });
-  });
+  return fetch(config.baseUrl + '/users/me', {
+    headers: config.headers,
+  }).then((res) => checkResponse(res));
 };
 
 
@@ -41,87 +31,62 @@ const getInitialInfo = async () => {
 
 
 const updateUserProfile = async (userProfileData) => {
-  return new Promise((resolve, reject) => {
-    fetch(config.baseUrl + '/users/me', {
+    return fetch(config.baseUrl + '/users/me', {
       method: 'PATCH',
       headers: config.headers,
       body: JSON.stringify({
         name: userProfileData.name,
         about: userProfileData.about,
       }),
-    }).then((res) => {
-      if (res.ok) {
-        resolve(res.json());
-      }
-      reject(`Ошибка: ${res.status}`);
-    });
-  });
-};
+    }).then((res) => checkResponse(res));
+  };
 
 
 const postNewCard = async (cardData) => {
-  return new Promise((resolve, reject) => {
-    fetch(config.baseUrl + '/cards', {
-      method: 'POST',
-      headers: config.headers,
-      body: JSON.stringify({
-        name: cardData.name,
-        link: cardData.link,
-      }),
-    }).then((res) => {
-      if (res.ok) {
-        resolve(res.json());
-      }
-      reject(`Ошибка: ${res.status}`);
-    });
-  });
+  return fetch(config.baseUrl + '/cards', {
+    method: 'POST',
+    headers: config.headers,
+    body: JSON.stringify({
+      name: cardData.name,
+      link: cardData.link,
+    }),
+  }).then((res) => checkResponse(res));
 };
 
 
 const putLike = async (cardId) => {
-  return new Promise((resolve, reject) => {
-    fetch(config.baseUrl + `/cards/likes/${cardId}`, {
-      method: 'PUT',
-      headers: config.headers,
-    }).then((res) => {
-      if (res.ok) {
-        resolve(res.json());
-      }
-      reject(`Ошибка: ${res.status}`);
-    });
-  });
+  return fetch(config.baseUrl + `/cards/likes/${cardId}`, {
+    method: 'PUT',
+    headers: config.headers,
+  }).then((res) => checkResponse(res));
 };
 
 
 const deleteLike = async (cardId) => {
-  return new Promise((resolve, reject) => {
-    fetch(config.baseUrl + `/cards/likes/${cardId}`, {
-      method: 'DELETE',
-      headers: config.headers,
-    }).then((res) => {
-      if (res.ok) {
-        resolve(res.json());
-      }
-      reject(`Ошибка: ${res.status}`);
-    });
-  });
+  return fetch(config.baseUrl + `/cards/likes/${cardId}`, {
+    method: 'DELETE',
+    headers: config.headers,
+  }).then((res) => checkResponse(res));
 };
 
 
 const deleteCard = async (cardId) => {
-  return new Promise((resolve, reject) => {
-    fetch(config.baseUrl + `/cards/${cardId}`, {
-      method: 'DELETE',
-      headers: config.headers,
-    }).then((res) => {
-      if (res) {
-        resolve(res.json());
-      }
-      reject(`Ошибка: ${res.status}`);
-    });
-  });
+  return fetch(config.baseUrl + `/cards/${cardId}`, {
+    method: 'DELETE',
+    headers: config.headers,
+  }).then((res) => checkResponse(res));
 };
 
+
+const updateUserAvatar = async (avatarLink) => {
+  return fetch(config.baseUrl + '/users/me/avatar', {
+    method: 'PATCH',
+    headers: config.headers,
+    body: JSON.stringify({
+      avatar: avatarLink,
+    }),
+  }).then((res) => checkResponse(res));
+};
 
 export {
   getInitialCards,
@@ -132,4 +97,5 @@ export {
   putLike,
   deleteLike,
   deleteCard,
+  updateUserAvatar,
 };
