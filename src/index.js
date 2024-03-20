@@ -1,10 +1,12 @@
 
 import './pages/index.css';
-import {initialCards} from './scripts/cards';
 import {renderCard, likeCard, deleteCard  } from './scripts/card';
 import {openPopup, closePopup, closeOverlay} from './scripts/modal';
+import { clearValidation, enableValidation } from './scripts/validation';
+import { getInitialInfo, postNewCard, updateUserProfile } from './scripts/api';
 
 
+const profileAvatar = document.querySelector('.profile__image');
 const popupProfile = document.querySelector('.popup_type_edit');
 const popupProfileForm = document.forms['edit-profile'];
 const profileTitle = document.querySelector('.profile__title');
@@ -18,6 +20,34 @@ const popupImage = popupImageElement.querySelector('.popup__image');
 const popupCaption = popupImageElement.querySelector('.popup__caption');
 const placesList = document.querySelector('.places__list'); 
 
+const validationConfig = {
+  formSelector: '.popup__form',
+  inputSelector: '.popup__input',
+  submitButtonSelector: '.popup__button',
+  inactiveButtonClass: 'popup__button_disabled',
+  inputErrorClass: 'popup__input_type_error',
+  errorClass: 'popup__error_visible',
+};
+
+
+const fillProfileInfo = (userInfo) => {
+  profileTitle.textContent = userInfo.name;
+  profileDescription.textContent = userInfo.about;
+  profileAvatar.style.backgroundImage = `url(${userInfo.avatar})`;
+};
+
+const renderInitialCards = (initialCards, userInfo) => {
+  initialCards.forEach((card) => {
+    renderCard(
+      card,
+      userInfo,
+      placesList,
+      likeCard,
+      deleteCard,
+      openImagePopup,
+    );
+  });
+};
 
 const openImagePopup = (imageURL, imageAlt, title) => {
   popupImage.src = imageURL;
@@ -27,15 +57,20 @@ const openImagePopup = (imageURL, imageAlt, title) => {
 };
 
 
-
-
-
-
-const handleProfileFormSubmit = (evt) => {
+const handleProfileFormSubmit = async (evt) => {
   evt.preventDefault();
-  profileTitle.textContent = popupProfileForm.name.value;
-  profileDescription.textContent = popupProfileForm.description.value;
-  closePopup(popupProfile);
+  updateUserProfile({
+    name: popupProfileForm.name.value,
+    about: popupProfileForm.description.value,
+  })
+    .then((updatedProfile) => {
+      fillProfileInfo(updatedProfile);
+      closeModal(popupProfile);
+      clearValidation(popupProfile, validationConfig);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 };
 
 
@@ -51,6 +86,7 @@ popupImageElement.addEventListener('click', (evt) => {
 
 
 profileEditButton.addEventListener('click', () => {
+  clearValidation(popupProfile, validationConfig);
   fillProfilePopup(
     popupProfileForm,
     profileTitle.textContent,
@@ -69,30 +105,35 @@ popupProfile.addEventListener('click', (evt) => {
 
 
 newCardButton.addEventListener('click', () => {
+  popupNewCardForm.reset();
+  clearValidation(popupNewCard, validationConfig);
   openPopup(popupNewCard);
 });
 
 
-popupNewCardForm.addEventListener('submit', (evt) => {
+popupNewCardForm.addEventListener('submit', async(evt) => {
   evt.preventDefault();
   const name = popupNewCardForm.elements['place-name'].value;
   const link = popupNewCardForm.elements.link.value;
-  const description = name;
-  const newCard = {
-    name,
-    link,
-    description,
-  };
-  renderCard(
-    newCard,
-    placesList,
-    likeCard,
-    deleteCard,
-    openImagePopup,
-    'start',
-  );
-  closePopup(popupNewCard);
-  popupNewCardForm.reset();
+  const userInfo = { name: profileTitle.textContent };
+  postNewCard({ name, link })
+    .then((newCard) => {
+      renderCard(
+        newCard,
+        userInfo,
+        placesList,
+        likeCard,
+        deleteCard,
+        openImagePopup,
+        'start',
+      );
+      closePopup(popupNewCard);
+      popupNewCardForm.reset();
+      clearValidation(popupNewCard, validationConfig);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 });
 
 
@@ -110,7 +151,16 @@ closeButtons.forEach((button) => {
 });
 
 
+getInitialInfo()
+  .then((result) => {
+    const userInfo = result[0];
+    const initialCards = result[1];
+    fillProfileInfo(userInfo);
+    renderInitialCards(initialCards, userInfo);
+  })
+  .catch((err) => {
+    console.log(err);
+  });
 
-initialCards.forEach((card) =>
-  renderCard(card, placesList, likeCard, deleteCard, openImagePopup),
-);
+
+enableValidation(validationConfig);
