@@ -5,6 +5,7 @@ import {openPopup, closePopup, closeOverlay} from './scripts/modal';
 import { clearValidation, enableValidation } from './scripts/validation';
 import { getInitialInfo, postNewCard, updateUserProfile, updateUserAvatar } from './scripts/api';
 
+
 const popupAvatar = document.querySelector('.popup_type_avatar');
 const popupAvatarForm = document.forms['edit-avatar'];
 const avatarEditButton = document.querySelector('.profile__image-container');
@@ -21,6 +22,9 @@ const popupImageElement = document.querySelector('.popup_type_image');
 const popupImage = popupImageElement.querySelector('.popup__image');
 const popupCaption = popupImageElement.querySelector('.popup__caption');
 const placesList = document.querySelector('.places__list'); 
+const buttonProfile =  popupProfileForm.querySelector('.popup__button');
+const buttonNewCard = popupNewCardForm.querySelector('.popup__button');
+const buttonAvatar = popupAvatarForm.querySelector('.popup__button');
 
 
 const validationConfig = {
@@ -68,9 +72,10 @@ const renderLoading = (isLoading, button) => {
 };
 
 
+
 const handleProfileFormSubmit = async (evt) => {
   evt.preventDefault();
-  renderLoading(true, popupProfileForm.querySelector('.popup__button'));
+  renderLoading(true, buttonProfile);
   updateUserProfile({
     name: popupProfileForm.name.value,
     about: popupProfileForm.description.value,
@@ -83,7 +88,7 @@ const handleProfileFormSubmit = async (evt) => {
       console.log(err);
     })
     .finally(() => {
-      renderLoading(true, popupProfileForm.querySelector('.popup__button'));
+      renderLoading(false, buttonProfile);
     });
 };
 
@@ -127,6 +132,7 @@ newCardButton.addEventListener('click', () => {
 
 popupNewCardForm.addEventListener('submit', async(evt) => {
   evt.preventDefault();
+  renderLoading(true, buttonNewCard );
   const name = popupNewCardForm.elements['place-name'].value;
   const link = popupNewCardForm.elements.link.value;
   const userInfo = { name: profileTitle.textContent };
@@ -145,7 +151,10 @@ popupNewCardForm.addEventListener('submit', async(evt) => {
     })
     .catch((err) => {
       console.log(err);
-    });
+    })
+    .finally(() => {
+      renderLoading(false, buttonAvatar );
+    })
 });
 
 
@@ -155,18 +164,17 @@ popupNewCard.addEventListener('click', (evt) => {
 
 const handleAvatarFormSubmit = async (evt) => {
   evt.preventDefault();
-  renderLoading(true, popupAvatarForm.querySelector('.popup__button'));
+  renderLoading(true, buttonAvatar );
   updateUserAvatar(popupAvatarForm.link.value)
     .then((updatedProfile) => {
       fillProfileInfo(updatedProfile);
       closePopup(popupAvatar);
-      clearValidation(popupAvatarForm, validationConfig);
     })
     .catch((err) => {
       console.log(err);
     })
     .finally(() => {
-      renderLoading(false, popupAvatarForm.querySelector('.popup__button'));
+      renderLoading(false, buttonAvatar );
     });
 };
 avatarEditButton.addEventListener('click', (evt) => {

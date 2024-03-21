@@ -57,10 +57,7 @@ const likeCard = async (evt) => {
     deleteLike(evt.target.closest('.card').id)
       .then((updatedCard) => {
         evt.target.classList.remove('card__like-button_is-active');
-        currentLikes.textContent = updatedCard.likes.reduce(
-          (accum, nextVal) => accum + 1,
-          0,
-        );
+        currentLikes.textContent = updatedCard.likes.length;
       })
       .catch((err) => {
         console.log(err);
@@ -69,10 +66,7 @@ const likeCard = async (evt) => {
     putLike(evt.target.closest('.card').id)
       .then((updatedCard) => {
         evt.target.classList.add('card__like-button_is-active');
-        currentLikes.textContent = updatedCard.likes.reduce(
-          (accum, nextVal) => accum + 1,
-          0,
-        );
+        currentLikes.textContent = updatedCard.likes.length;
       })
       .catch((err) => {
         console.log(err);
